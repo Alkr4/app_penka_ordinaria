@@ -4,32 +4,62 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import cn.pedant.SweetAlert.SweetAlertDialog
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import org.json.JSONException
 
 class Login : AppCompatActivity() {
+    private lateinit var usu: TextView
+    private lateinit var clave: TextView
+    private lateinit var btn: Button
+    private lateinit var datos: RequestQueue
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        findViewById<Button>(R.id.btn_login).setOnClickListener {
-            SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
-                .setTitleText("¡Inicio de sesión exitoso!")
-                .setContentText("Has iniciado sesión correctamente")
-                .setConfirmText("Continuar")
-                .setConfirmClickListener { dialog ->
-                    dialog.dismissWithAnimation()
-                    startActivity(Intent(this, Menu::class.java))
-                }
-                .show()
+        usu = findViewById(R.id.et_email)
+        clave = findViewById(R.id.et_password)
+        btn = findViewById(R.id.btn_login)
+        datos = Volley.newRequestQueue(this)
 
-            findViewById<TextView>(R.id.tv_register).setOnClickListener {
-                startActivity(Intent(this, Ingreso::class.java))
-            }
-
-            findViewById<TextView>(R.id.tv_forgot).setOnClickListener {
-                startActivity(Intent(this, OlvideContrasena::class.java))
-            }
+        btn.setOnClickListener {
+            consultarDatos(usu.text.toString(), clave.text.toString())
         }
+
+        findViewById<TextView>(R.id.tv_register).setOnClickListener {
+            startActivity(Intent(this, Ingreso::class.java))
+        }
+
+        findViewById<TextView>(R.id.tv_forgot).setOnClickListener {
+            startActivity(Intent(this, OlvideContrasena::class.java))
+        }
+    }
+
+    private fun consultarDatos(email: String, password: String) {
+        val url = "http://18.211.13.143/apiconsultausu.php?email=$email&password=$password"
+        val request = JsonObjectRequest(
+            Request.Method.GET, url, null,
+            { response ->
+                try {
+                    val estado = response.getString("estado")
+                    if (estado == "0") {
+                        Toast.makeText(this@Login, "Usuario no existe",Toast.LENGTH_SHORT).show()
+                    } else {
+                        startActivity(Intent(this@Login, Menu::class.java))
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            },
+            { error ->
+                error.printStackTrace()
+            }
+        )
+        datos.add(request)
     }
 }
