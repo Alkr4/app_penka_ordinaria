@@ -4,13 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
+import cn.pedant.SweetAlert.SweetAlertDialog
 
 class Login : AppCompatActivity() {
     private lateinit var usu: TextView
@@ -48,9 +48,19 @@ class Login : AppCompatActivity() {
                 try {
                     val estado = response.getString("estado")
                     if (estado == "0") {
-                        Toast.makeText(this@Login, "Usuario no existe",Toast.LENGTH_SHORT).show()
+                        SweetAlertDialog(this@Login, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Error")
+                            .setContentText("Usuario no existe")
+                            .show()
                     } else {
-                        startActivity(Intent(this@Login, Menu::class.java))
+                        SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
+                            .setTitleText("¡Éxito!")
+                            .setContentText("Bienvenido a penka app")
+                            .setConfirmClickListener { sDialog ->
+                                sDialog.dismissWithAnimation()
+                                startActivity(Intent(this, Menu::class.java))
+                            }
+                            .show()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
