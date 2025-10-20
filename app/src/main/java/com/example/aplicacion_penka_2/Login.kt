@@ -28,7 +28,24 @@ class Login : AppCompatActivity() {
         datos = Volley.newRequestQueue(this)
 
         btn.setOnClickListener {
-            consultarDatos(usu.text.toString(), clave.text.toString())
+            val emailVal = usu.text.toString().trim()
+            val passwordVal = clave.text.toString()
+
+            if (emailVal.isEmpty() || passwordVal.isEmpty()) {
+                SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Atención")
+                    .setContentText("Debe completar todos los campos")
+                    .show()
+                return@setOnClickListener
+            }
+            if (!esEmailValido(emailVal)) {
+                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Error")
+                    .setContentText("El formato del correo electrónico no es válido")
+                    .show()
+                return@setOnClickListener
+            }
+            consultarDatos(emailVal, passwordVal)
         }
 
         findViewById<TextView>(R.id.tv_register).setOnClickListener {
@@ -50,7 +67,7 @@ class Login : AppCompatActivity() {
                     if (estado == "0") {
                         SweetAlertDialog(this@Login, SweetAlertDialog.ERROR_TYPE)
                             .setTitleText("Error")
-                            .setContentText("Usuario no existe")
+                            .setContentText("Las credenciales son erróneas")
                             .show()
                     } else {
                         SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
@@ -71,5 +88,12 @@ class Login : AppCompatActivity() {
             }
         )
         datos.add(request)
+    }
+
+    private fun esEmailValido(email: String): Boolean {
+        if (email.isEmpty()) {
+            return false
+        }
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }

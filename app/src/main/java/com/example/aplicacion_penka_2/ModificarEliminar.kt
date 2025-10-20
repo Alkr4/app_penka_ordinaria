@@ -48,19 +48,39 @@ class ModificarEliminar : AppCompatActivity() {
         etTelefono.setText(telefono)
 
         btnModificar.setOnClickListener {
-            val nuevoNombre = etNombre.text.toString()
-            val nuevoApellido = etApellido.text.toString()
-            val nuevoEmail = etEmail.text.toString()
-            val nuevoTelefono = etTelefono.text.toString()
+            val nuevoNombre = etNombre.text.toString().trim()
+            val nuevoApellido = etApellido.text.toString().trim()
+            val nuevoEmail = etEmail.text.toString().trim()
+            val nuevoTelefono = etTelefono.text.toString().trim()
 
-            if (nuevoNombre.isNotEmpty() && nuevoApellido.isNotEmpty() && nuevoEmail.isNotEmpty()) {
-                modificarUsuario(nuevoNombre, nuevoApellido, nuevoEmail, nuevoTelefono)
-            } else {
+            // Validar campos vacíos
+            if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty() || nuevoEmail.isEmpty() || nuevoTelefono.isEmpty()) {
                 SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("¡Atención!")
                     .setContentText("Complete todos los campos")
                     .show()
+                return@setOnClickListener
             }
+
+            // Validar formato de email
+            if (!esEmailValido(nuevoEmail)) {
+                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Error")
+                    .setContentText("El formato del correo electrónico no es válido")
+                    .show()
+                return@setOnClickListener
+            }
+
+            // Validar número de teléfono
+            if (!esTelefonoValido(nuevoTelefono)) {
+                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Error")
+                    .setContentText("El número de teléfono debe contener 8 dígitos numéricos")
+                    .show()
+                return@setOnClickListener
+            }
+
+            modificarUsuario(nuevoNombre, nuevoApellido, nuevoEmail, nuevoTelefono)
         }
 
         btnEliminar.setOnClickListener {
@@ -114,5 +134,17 @@ class ModificarEliminar : AppCompatActivity() {
             }
         )
         datos.add(request)
+    }
+
+    private fun esEmailValido(email: String): Boolean {
+        if (email.isEmpty()) {
+            return false
+        }
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun esTelefonoValido(telefono: String): Boolean {
+        val patron = Regex("\\d{8}")
+        return patron.matches(telefono)
     }
 }

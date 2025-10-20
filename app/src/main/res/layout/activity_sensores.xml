@@ -8,27 +8,25 @@
     android:padding="24dp">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imgAvatar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo"
-        android:layout_width="359dp"
-        android:layout_height="175dp"
-        android:layout_marginTop="20dp" />
+        android:src="@mipmap/ic_launcher_round" />
 
     <TextView
         android:id="@+id/txtFechaHora"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
         android:text="Fecha/Hora"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+        app:layout_constraintTop_toBottomOf="@+id/imgAvatar" />
 
     <ImageView
         android:id="@+id/iconTemperatura"

@@ -2,7 +2,10 @@ package com.example.aplicacion_penka_2
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
@@ -15,7 +18,10 @@ import cn.pedant.SweetAlert.SweetAlertDialog
 class Lista : AppCompatActivity() {
     private lateinit var list: ListView
     private lateinit var datos: RequestQueue
-    private var listaUsuarios = ArrayList<String>()
+    private var listaUsuariosCompleta = ArrayList<String>()
+    private var listaUsuariosFiltrada = ArrayList<String>()
+    private lateinit var adapter: ArrayAdapter<String>
+    private lateinit var etBuscador: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,14 +29,19 @@ class Lista : AppCompatActivity() {
 
         list = findViewById(R.id.listado_usuarios)
         datos = Volley.newRequestQueue(this)
+        etBuscador = findViewById(R.id.etBuscador)
+
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listaUsuariosFiltrada)
+        list.adapter = adapter
 
         list.setOnItemClickListener { parent, view, position, id ->
-            val usuarioSeleccionado = listaUsuarios[position]
+            val usuarioSeleccionado = listaUsuariosFiltrada[position]
+
             val partes = usuarioSeleccionado.split("|")
 
             if (partes.size >= 5) {
                 val intent = Intent(this, ModificarEliminar::class.java).apply {
-                    putExtra("id", partes[0]) // Pasa el ID
+                    putExtra("id", partes[0])
                     putExtra("nombre", partes[1])
                     putExtra("apellido", partes[2])
                     putExtra("email", partes[3])
@@ -44,6 +55,33 @@ class Lista : AppCompatActivity() {
                     .show()
             }
         }
+
+        etBuscador.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filtrarLista(s.toString())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun filtrarLista(texto: String) {
+        listaUsuariosFiltrada.clear()
+        if (texto.isEmpty()) {
+            listaUsuariosFiltrada.addAll(listaUsuariosCompleta)
+        } else {
+            val textoBusqueda = texto.lowercase()
+            for (usuario in listaUsuariosCompleta) {
+                val partes = usuario.split(" | ")
+                if (partes.size > 2) {
+                    val nombreCompleto = "${partes[1]} ${partes[2]}".lowercase()
+                    if (nombreCompleto.contains(textoBusqueda)) {
+                        listaUsuariosFiltrada.add(usuario)
+                    }
+                }
+            }
+        }
+        adapter.notifyDataSetChanged()
     }
 
     override fun onResume() {
@@ -52,7 +90,7 @@ class Lista : AppCompatActivity() {
     }
 
     private fun cargaLista() {
-        listaUsuarios.clear()
+        listaUsuariosCompleta.clear()
         val url = "http://18.211.13.143/consultas.php"
         val request = StringRequest(
             Request.Method.GET, url,
@@ -63,10 +101,12 @@ class Lista : AppCompatActivity() {
                         val usuarios = json.getJSONObject(i)
                         val linea =
                             "${usuarios.getString("id")}|${usuarios.getString("nombre")}|${usuarios.getString("apellido")}|${usuarios.getString("email")}|${usuarios.getString("telefono")}"
-                        listaUsuarios.add(linea)
+
+                        listaUsuariosCompleta.add(linea)
                     }
-                    val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listaUsuarios)
-                    list.adapter = adapter
+
+                    filtrarLista(etBuscador.text.toString())
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
