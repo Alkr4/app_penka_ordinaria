@@ -81,11 +81,11 @@
             android:src="@drawable/ic_luz_off" />
 
         <ImageView
-            android:id="@+id/iconSonido"
+            android:id="@+id/iconLinterna"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_sonido_off" />
+            android:src="@drawable/ic_linterna_off" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

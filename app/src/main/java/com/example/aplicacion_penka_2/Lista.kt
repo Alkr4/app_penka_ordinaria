@@ -72,7 +72,7 @@ class Lista : AppCompatActivity() {
         } else {
             val textoBusqueda = texto.lowercase()
             for (usuario in listaUsuariosCompleta) {
-                val partes = usuario.split(" | ")
+                val partes = usuario.split("|")
                 if (partes.size > 2) {
                     val nombreCompleto = "${partes[1]} ${partes[2]}".lowercase()
                     if (nombreCompleto.contains(textoBusqueda)) {

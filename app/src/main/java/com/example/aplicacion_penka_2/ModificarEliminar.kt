@@ -61,6 +61,22 @@ class ModificarEliminar : AppCompatActivity() {
                     .show()
                 return@setOnClickListener
             }
+            // Validar Nombre
+            if (!esTextoValido(nuevoNombre)) {
+                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Error")
+                    .setContentText("El nombre solo debe contener letras y espacios")
+                    .show()
+                return@setOnClickListener
+            }
+            //Validar Apellido
+            if (!esTextoValido(nuevoApellido)) {
+                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Error")
+                    .setContentText("El apellido solo debe contener letras y espacios")
+                    .show()
+                return@setOnClickListener
+            }
 
             // Validar formato de email
             if (!esEmailValido(nuevoEmail)) {
@@ -146,5 +162,10 @@ class ModificarEliminar : AppCompatActivity() {
     private fun esTelefonoValido(telefono: String): Boolean {
         val patron = Regex("\\d{8}")
         return patron.matches(telefono)
+    }
+
+    private fun esTextoValido(texto: String): Boolean {
+        val patron = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+\$")
+        return texto.isNotEmpty() && patron.matches(texto)
     }
 }

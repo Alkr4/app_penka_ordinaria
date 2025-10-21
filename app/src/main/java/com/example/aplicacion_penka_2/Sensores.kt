@@ -21,14 +21,14 @@ import java.util.Locale
 class Sensores : AppCompatActivity() {
 
     private var luzEncendida = false
-    private var sonidoEncendido = false
+    private var linternaEncendida = false
 
     private lateinit var txtFechaHora: TextView
     private lateinit var txtTemperatura: TextView
     private lateinit var txtHumedad: TextView
     private lateinit var iconTemperatura: ImageView
     private lateinit var iconLuz: ImageView
-    private lateinit var iconSonido: ImageView
+    private lateinit var iconLinterna: ImageView
 
     private lateinit var datos: RequestQueue
     private val apiHandler = Handler(Looper.getMainLooper())
@@ -46,7 +46,7 @@ class Sensores : AppCompatActivity() {
         txtHumedad = findViewById(R.id.txtHumedad)
         iconTemperatura = findViewById(R.id.iconTemperatura)
         iconLuz = findViewById(R.id.iconLuz)
-        iconSonido = findViewById(R.id.iconSonido)
+        iconLinterna = findViewById(R.id.iconLinterna)
 
         datos = Volley.newRequestQueue(this)
 
@@ -55,19 +55,19 @@ class Sensores : AppCompatActivity() {
             cameraId = cameraManager.cameraIdList[0]
         } catch (e: Exception) {
             e.printStackTrace()
-            iconLuz.isEnabled = false
+            iconLinterna.isEnabled = false
         }
 
         iconTemperatura.setImageResource(R.drawable.ic_temp_moderada)
 
-        iconLuz.setOnClickListener {
+        iconLinterna.setOnClickListener {
             controlarLinterna()
         }
 
-        iconSonido.setOnClickListener {
-            sonidoEncendido = !sonidoEncendido
-            iconSonido.setImageResource(
-                if (sonidoEncendido) R.drawable.ic_sonido_on else R.drawable.ic_sonido_off
+        iconLuz.setOnClickListener {
+            luzEncendida = !luzEncendida
+            iconLuz.setImageResource(
+                if (luzEncendida) R.drawable.ic_luz_on else R.drawable.ic_luz_off
             )
         }
         iniciarConsultaAPI()
@@ -76,17 +76,17 @@ class Sensores : AppCompatActivity() {
     private fun controlarLinterna() {
         if (cameraId == null) return
         try {
-            luzEncendida = !luzEncendida
+            linternaEncendida = !linternaEncendida
 
-            cameraManager.setTorchMode(cameraId!!, luzEncendida)
+            cameraManager.setTorchMode(cameraId!!, linternaEncendida)
 
-            iconLuz.setImageResource(
-                if (luzEncendida) R.drawable.ic_luz_on else R.drawable.ic_luz_off
+            iconLinterna.setImageResource(
+                if (linternaEncendida) R.drawable.ic_linterna_on else R.drawable.ic_linterna_off
             )
 
             SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
                 .setTitleText("¡Hecho!")
-                .setContentText("Linterna ${if (luzEncendida) "Encendida" else "Apagada"}")
+                .setContentText("Linterna ${if (linternaEncendida) "Encendida" else "Apagada"}")
                 .show()
 
         } catch (e: CameraAccessException) {
@@ -143,11 +143,11 @@ class Sensores : AppCompatActivity() {
         apiHandler.removeCallbacks(apiRunnable)
 
 
-        if (luzEncendida && cameraId != null) {
+        if (linternaEncendida && cameraId != null) {
             try {
                 cameraManager.setTorchMode(cameraId!!, false)
             } catch (e: CameraAccessException) { }
-            luzEncendida = false
+            linternaEncendida = false
         }
     }
 
@@ -155,7 +155,7 @@ class Sensores : AppCompatActivity() {
         super.onResume()
         iniciarConsultaAPI()
 
-        iconLuz.setImageResource(R.drawable.ic_luz_off)
-        luzEncendida = false
+        iconLinterna.setImageResource(R.drawable.ic_linterna_off)
+        linternaEncendida = false
     }
 }
